@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fandom Drop Loyalty Card</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Dancing+Script:wght@500;700&family=Noto+Sans+Bengali:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0a0a0f;
+      --card-bg: #11121a;
+      --accent-pink: #ff3366;
+      --accent-blue: #0476f2;
+      --text-muted: #8b8d99;
+      --border-color: #242635;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      padding: 20px;
+    }
+
+    /*     */
+    .loyalty-card {
+      width: 525px; /* .   */
+      height: 300px; /*    */
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    /*      */
+    .loyalty-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255, 51, 102, 0.05), transparent 70%);
+      z-index: 1;
+    }
+
+    /*  :  */
+    .card-header {
+      z-index: 2;
+    }
+
+    .brand-logo {
+      font-family: 'Black Ops One', cursive;
+      font-size: 32px;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--accent-pink), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      user-select: none;
+      display: inline-block;
+    }
+
+    .card-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-top: 4px;
+      font-weight: 300;
+    }
+
+    /*  :      */
+    .card-body {
+      z-index: 2;
+      margin: 12px 0;
+    }
+
+    .emotional-line {
+      font-size: 16px;
+      color: #e2e4f0;
+      font-weight: 400;
+      line-height: 1.5;
+      border-left: 3px solid var(--accent-pink);
+      padding-left: 12px;
+    }
+
+    /*  :     */
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 2;
+    }
+
+    .code-container {
+      flex-grow: 1;
+    }
+
+    .code-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    /*      */
+    .code-box {
+      width: 180px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(255, 51, 102, 0.3);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /*       */
+    .code-space {
+      color: #6c6f80;
+      font-family: monospace;
+      font-size: 14px;
+      letter-spacing: 3px;
+    }
+
+    /*   :        */
+    .user-info {
+      text-align: right;
+    }
+
+    .name-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    /*        */
+    .name-line {
+      width: 200px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+      margin-bottom: 12px;
+      height: 20px;
+      display: inline-block;
+    }
+
+    /*    Cursive    */
+    .thanks-message {
+      font-family: 'Dancing Script', cursive;
+      font-size: 19px;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loyalty-card">
+    
+    <div class="card-header">
+      <div class="brand-logo">FANDOM DROP</div>
+      <div class="card-title">Loyalty Club Card</div>
+    </div>
+
+    <div class="card-body">
+      <p class="emotional-line">You are with us on this journey to embody not just the clothes, but the fandom you love.</p>
+    </div>
+
+    <div class="card-footer">
+      <div class="code-container">
+        <div class="code-label">Unique membership code</div>
+        <div class="code-box">
+          <span class="code-space">FD - ______</span>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <div class="name-line"></div>
+        <div class="thanks-message">Thanks to be a part of our journey</div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

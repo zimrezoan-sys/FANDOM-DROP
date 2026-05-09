@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FANDOM DROP — Direct to WhatsApp</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --border: #2a2a3d;
+    --text: #f0f0f8;
+    --muted: #7070a0;
+    --accent-anime: #ff3366;
+    --accent-cartoon: #ffcc00;
+    --accent-marvel: #e23636;
+    --accent-dc: #0476f2;
+    --accent-active: #ff3366;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 100px;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:0;
+  }
+
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px; display: flex; align-items: center; justify-content: center; height: 70px;
+  }
+
+  .logo {
+    font-family: 'Black Ops One', cursive; font-size: 26px; letter-spacing: 2px;
+    background: linear-gradient(90deg, var(--accent-anime), var(--accent-dc));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .hero { text-align: center; padding: 60px 20px 40px; position: relative; z-index: 1; }
+  .hero-title { font-family: 'Black Ops One', cursive; font-size: clamp(35px, 7vw, 70px); line-height: 1; margin-bottom: 15px; color: var(--text); }
+  .hero-sub { color: var(--muted); max-width: 500px; margin: 0 auto; font-size: 14px; line-height: 1.6; }
+
+  .selector-section { padding: 0 40px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+  .section-label { font-family: 'Bebas Neue'; letter-spacing: 3px; color: var(--muted); margin: 30px 0 15px; font-size: 14px; text-transform: uppercase; }
+  
+  .apparel-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .apparel-tab {
+    padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted); font-weight: 600; cursor: pointer; transition: 0.3s;
+  }
+  .apparel-tab.active { border-color: var(--accent-active); color: #fff; background: rgba(255,51,102,0.15); }
+
+  .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
+  .cat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 15px;
+    padding: 25px 10px; text-align: center; cursor: pointer; transition: 0.3s;
+  }
+  .cat-card:hover { transform: translateY(-5px); background: var(--surface2); }
+  .cat-card.active { border-color: var(--text); box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+  
+  .cat-img { width: 50px; height: 50px; object-fit: contain; margin-bottom: 8px; }
+  .cat-name { font-family: 'Black Ops One'; font-size: 16px; }
+
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding-bottom: 60px; }
+  .product-card { 
+    background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); 
+    transition: 0.3s; cursor: pointer; position: relative; display: flex; flex-direction: column;
+  }
+  .product-card:hover { border-color: var(--accent-active); }
+  .product-card.selected { border-color: #25D366; background: rgba(37, 211, 102, 0.03); }
+  
+  .product-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 15px; width: 100%; height: 45px;
+  }
+  .qty-label {
+    font-family: 'Bebas Neue'; font-size: 20px; color: #25D366;
+    text-shadow: 0 0 10px rgba(37, 211, 102, 0.4);
+    visibility: hidden;
+  }
+  .selected .qty-label { visibility: visible; }
+
+  .qty-controls {
+    display: flex; gap: 10px; visibility: hidden;
+  }
+  .selected .qty-controls { visibility: visible; }
+
+  .qty-btn {
+    background: transparent; border: none; color: #fff;
+    font-family: 'Bebas Neue'; font-size: 24px; width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: 0.2s; line-height: 1;
+  }
+  .qty-btn.plus { color: #25D366; }
+  .qty-btn.minus { color: #ff3366; }
+  .qty-btn:active { transform: scale(1.2); }
+
+  .product-img { 
+  width: 100%; 
+  aspect-ratio: 1.1; 
+  background: #1c1c28; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  overflow: hidden; /* ছবি যেন কার্ডের বাইরে চলে না যায় */
+  border-bottom: 1px solid var(--border); 
+}
+
+.product-info { padding: 15px; text-align: center; }
+.product-price { font-family: 'Bebas Neue'; font-size: 24px; color: #25D366; margin-top: 5px; }
+.whatsapp-tag { font-size: 10px; color: #25D366; font-weight: bold; text-transform: uppercase; margin-top: 8px; display: block; }
+
+
+  .shop-bar {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    width: calc(100% - 40px); max-width: 500px; z-index: 1000;
+    display: none;
+  }
+  .shop-btn {
+    width: 100%; background: #25D366; color: #fff; border: none; padding: 18px;
+    border-radius: 15px; font-family: 'Black Ops One'; font-size: 18px; cursor: pointer;
+    box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3); transition: 0.3s;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .shop-btn:hover { background: #20ba5a; transform: translateY(-3px); }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(5,5,8,0.85);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    z-index: 2000; display: none; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; transition: opacity 0.3s ease;
+  }
+  .modal-overlay.active { display: flex; opacity: 1; }
+
+  .checkout-modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; width: 100%; max-width: 480px; padding: 30px;
+    position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-close {
+    position: absolute; top: 20px; right: 20px; background: transparent;
+    border: none; color: var(--muted); font-size: 24px; cursor: pointer;
+    transition: 0.2s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .form-title { font-family: 'Black Ops One', cursive; font-size: 20px; margin-bottom: 20px; color: var(--text); }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
+  
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 12px 16px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; transition: 0.3s; outline: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent-active); }
+
+  .form-select option { background: var(--surface2); color: var(--text); }
+  .form-textarea { resize: vertical; min-height: 70px; }
+
+  footer { text-align: center; padding: 40px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; }
+
+  @media (max-width: 768px) {
+    .categories-grid { grid-template-columns: repeat(1, 1fr); }
+    header { padding: 0 20px; }
+    .selector-section { padding: 0 20px; }
+    .checkout-modal { padding: 25px 20px; }
+  }
+  
+  /* স্লাইডার কন্টেইনার */
+.img-container {
+    position: relative;
+    width: 100%;
+}
+
+/* সোয়াইপ স্লাইডার */
+.product-img-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    width: 100%;
+    aspect-ratio: 1.1;
+}
+
+/* স্ক্রলবার লুকানোর জন্য */
+.product-img-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.product-img-slider img {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    scroll-snap-align: start;
+}
+
+/* ডট ইন্ডিকেটর */
+.dot-container {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    pointer-events: none;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    background: #25D366; /* আপনার থিম কালার */
+    width: 14px;
+    border-radius: 10px;
+}
+
+
+/* ১. ইমেজ কন্টেইনার (এটি আপনার ফ্রেম ঠিক রাখবে) */
+.img-container {
+    width: 100%;
+    aspect-ratio: 1 / 1; 
+    overflow: hidden;
+    position: relative;
+    background: #1a1a1a; 
+}
+
+/* ২. দামের বক্স (সবকিছু মাঝখানে আনবে) */
+.price-box {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    gap: 10px;
+    margin: 5px 0 10px 0; 
+    width: 100%;
+    min-height: 30px; 
+}
+
+/* ৩. পুরনো কাটা দাম (লাল রঙ) */
+.old-price {
+    color: #ff4d4d;
+    text-decoration: line-through;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* ৪. বর্তমান নতুন দাম (সবুজ রঙ ও বড় ফন্ট) */
+.current-price {
+    font-family: 'Bebas Neue', sans-serif; 
+    color: #25D366; 
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* ৫. প্রোডাক্ট ইনফো (নিশ্চিত করবে সব টেক্সট মাঝখানে আছে) */
+.product-info {
+    padding: 15px;
+    text-align: center;
+}
+
+
+.discount-label {
+    text-align: center;
+    color: #FF6101; /* আপনার দেওয়া নতুন অরেঞ্জ কালার */
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-top: 15px;
+    margin-bottom: -10px;
+    text-transform: uppercase;
+    
+    /* কমলা রঙের নিওন গ্লো ইফেক্ট */
+    text-shadow: 
+        0 0 5px #FF6101, 
+        0 0 15px #FF6101, 
+        0 0 30px #FF3100; /* একটু লালচে আভা যোগ করা হয়েছে গভীরতার জন্য */
+        
+    animation: orangePulse 1.5s infinite alternate;
+}
+
+/* গ্লো পালসিং এনিমেশন */
+@keyframes orangePulse {
+    from {
+        text-shadow: 0 0 5px #FF6101, 0 0 10px #FF6101;
+        transform: scale(1);
+    }
+    to {
+        text-shadow: 0 0 15px #FF6101, 0 0 30px #FF6101, 0 0 45px #FF3100;
+        transform: scale(1.03); /* হালকা একটু বড় হবে ভাইব দেওয়ার জন্য */
+    }
+}
+
+
+  
+  
+</style>
+</head>
+<body>
+
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px;">
+  <div style="width: 30px;"></div> 
+
+  <div class="logo" style="flex-grow: 1; text-align: center;">FANDOM DROP</div>
+
+  <div class="search-icon" onclick="toggleSearch()" style="cursor: pointer; display: flex; align-items: center;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text); opacity: 0.8;">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+  </div>
+</header>
+
+<div id="searchOverlay" style="display:none; background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 20px;">
+  <input type="text" id="productSearch" class="form-input" placeholder="Search products..." onkeyup="filterProducts()" style="width: 100%; background: transparent; border: none; font-size: 16px; color: var(--text); outline: none;">
+</div>
+
+
+
+<section class="hero">
+  <h1 class="hero-title">GET THE GEAR</h1>
+  <p class="hero-sub">সহজেই অর্ডার করতে আপনার পছন্দের ক্যাটাগরি এবং পণ্যটি সিলেক্ট করুন। সরাসরি হোয়াটসঅ্যাপে আমাদের সাথে যোগাযোগ করুন।</p>
+</section>
+
+  
+<section class="selector-section">
+  <p class="section-label">// Select Gear Type</p>
+  <div class="apparel-tabs">
+    <button class="apparel-tab active" onclick="setApparel('all', this)">All Items</button>
+    <button class="apparel-tab" onclick="setApparel('tshirt', this)">T-Shirts</button>
+    <button class="apparel-tab" onclick="setApparel('cap', this)">Caps</button>
+    <button class="apparel-tab" onclick="setApparel('jacket', this)">Jackets</button>
+  </div>
+
+  <p class="section-label">// Choose Fandom</p>
+  <div class="categories-grid">
+    <div class="cat-card" onclick="setCategory('anime', this)">
+      <img src="anime-image.png" alt="Anime" class="cat-img"> 
+      <div class="cat-name" style="color:var(--accent-anime)">ANIME</div>
+    </div>
+    <div class="cat-card" onclick="setCategory('superhero', this)">
+      <img src="superhero-image.png" alt="Super Hero" class="cat-img">
+      <div class="cat-name" style="color:var(--accent-marvel)">SUPER HERO</div>
+    </div>
+    <div class="cat-card" onclick="setCategory('sports', this)">
+      <img src="sports-image.png" alt="Sports" class="cat-img">
+      <div class="cat-name" style="color:var(--accent-dc)">SPORTS</div>
+    </div>
+  </div>
+
+  <p class="section-label" id="resultsLabel">// Products</p>
+  <div class="products-grid" id="productsGrid">
+    <p style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px;">উপরে একটি Fandom সিলেক্ট করুন!</p>
+  </div>
+</section>
+
+<div class="shop-bar" id="shopBar">
+  <button class="shop-btn" onclick="openCheckoutModal()">
+    <span>CONFIRM ORDER</span>
+    <span id="cartCount">0 Items</span>
+  </button>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="checkout-modal">
+    <button class="modal-close" onclick="closeCheckoutModal()">×</button>
+    <div class="form-title">DELIVERY INFO</div>
+    
+    <div class="form-group">
+      <label class="form-label" for="custName">আপনার নাম</label>
+      <input type="text" id="custName" class="form-input" placeholder="আপনার নাম লিখুন">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="custPhone">ফোন নম্বর</label>
+      <input type="tel" id="custPhone" class="form-input" placeholder="01XXXXXXXXX">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="divSelect">বিভাগ</label>
+      
+  
+  <select id="divSelect" class="form-select" onchange="updateDistricts()">
+  <option value="">বিভাগ সিলেক্ট করুন</option>
+  <option value="ঢাকা">ঢাকা বিভাগ</option>
+  <option value="চট্টগ্রাম">চট্টগ্রাম বিভাগ</option>
+  <option value="রাজশাহী">রাজশাহী বিভাগ</option>
+  <option value="খুলনা">খুলনা বিভাগ</option>
+  <option value="বরিশাল">বরিশাল বিভাগ</option>
+  <option value="সিলেট">সিলেট বিভাগ</option>
+  <option value="রংপুর">রংপুর বিভাগ</option>
+  <option value="ময়মনসিংহ">ময়মনসিংহ বিভাগ</option>
+</select>
+
+  
+  
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="distSelect">জেলা</label>
+      <select id="distSelect" class="form-select" onchange="updateUpazilas()" disabled>
+        <option value="">প্রথমে বিভাগ সিলেক্ট করুন</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="upSelect">উপজেলা</label>
+      <select id="upSelect" class="form-select" disabled>
+        <option value="">প্রথমে জেলা সিলেক্ট করুন</option>
+      </select>
+    </div>
+
+    <div id="deliveryNotice" style="margin: 15px 0; color: #25D366; font-weight: bold; font-size: 14px; text-align: center; background: rgba(37, 211, 102, 0.1); padding: 10px; border-radius: 8px; display: none; border: 1px dashed rgba(37, 211, 102, 0.3);">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="custLandmark">চেনার উপায় বর্ণনা করুন</label>
+      <textarea id="custLandmark" class="form-textarea" placeholder="আপনার বিস্তারিত ঠিকানা বা কোনো চেনার উপায় লিখুন"></textarea>
+    </div>
+    
+
+    <button class="shop-btn" onclick="sendWhatsAppOrder()" style="margin-top: 10px;">
+      <span>SEND TO WHATSAPP</span>
+      <span>➔</span>
+    </button>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 FANDOM DROP | Designed for Fans</p>
+</footer>
+
+<script>
+const myNumber = "8801881801333"; 
+
+
+       
+
+
+const products = [
+  { id: 1, type: 'tshirt', cat: 'anime', name: 'Zoro Three-Sword Tee', price: '৳১২০০', priceNum: 1200, images: ['zoro-front.jpg', 'zoro-back.jpg', 'zoro-detail.jpg'] },
+  { id: 2, type: 'jacket', cat: 'anime', name: 'Akatsuki Cloud Jacket', price: '৳২৫০০', priceNum: 2500, images: ['akatsuki-front.jpg', 'akatsuki-back.jpg', 'akatsuki-detail.jpg'] },
+  { id: 3, type: 'cap', cat: 'superhero', name: 'Avengers Logo Cap', price: '৳৮০০', priceNum: 800, images: ['avengers-front.jpg', 'avengers-back.jpg', 'avengers-detail.jpg'] },
+  { id: 4, type: 'tshirt', cat: 'superhero', name: 'Iron Man Arc Reactor', price: '৳১৩০০', priceNum: 1300, images: ['ironman-front.jpg', 'ironman-back.jpg', 'ironman-detail.jpg'] },
+  { 
+  id: 5, 
+  type: 'tshirt', 
+  cat: 'superhero', 
+  name: 'Batman Bat-Signal Tee', 
+  price: '৳১০০০',        // এটা এখন আপনার বর্তমান নতুন দাম
+  priceNum: 1000,       // ক্যালকুলেশনের জন্য নাম্বারটিও ১০০০ করে দিন
+  oldPrice: '৳১২৫০',    // এই দামের ওপর লাল কাটা দাগ পড়বে
+  images: ['batman-tee-front.jpg', 'batman-tee-back.jpg', 'batman-tee-detail.jpg'] 
+},
+
+  { id: 6, type: 'jacket', cat: 'superhero', name: 'Batman Varsity Jacket', price: '৳২২০০', priceNum: 2200, images: ['batman-jk-front.jpg', 'batman-jk-back.jpg', 'batman-jk-detail.jpg'] },
+  { id: 7, type: 'cap', cat: 'sports', name: 'Cricket Fan Snapback', price: '৳৭৫০', priceNum: 750, images: ['cricket-front.jpg', 'cricket-back.jpg', 'cricket-detail.jpg'] },
+  { id: 8, type: 'tshirt', cat: 'sports', name: 'Football Jersey Edition', price: '৳১১০০', priceNum: 1100, images: ['football-front.jpg', 'football-back.jpg', 'football-detail.jpg'] },
+  { id: 9, type: 'tshirt', cat: 'anime', name: 'Naruto Sage Mode Tee', price: '৳১২০০', priceNum: 1200, images: ['naruto-front.jpg', 'naruto-back.jpg', 'naruto-detail.jpg'] },
+  { id: 10, type: 'cap', cat: 'superhero', name: 'Superman Emblem Cap', price: '৳৮৫০', priceNum: 850, images: ['superman-front.jpg', 'superman-back.jpg', 'superman-detail.jpg'] }
+];
+
+
+const bdData = {
+  "ঢাকা": {
+    "ঢাকা": ["মিরপুর", "মোহাম্মদপুর", "ধানমন্ডি", "গুলশান", "উত্তরা", "মতিঝিল", "তেজগাঁও", "রমনা", "লালবাগ", "পল্টন", "বাড্ডা", "সাভার", "ধামরাই", "কেরানীগঞ্জ", "দোহার", "নবাবগঞ্জ"],
+    "গাজীপুর": ["গাজীপুর সদর", "কালিয়াকৈর", "কালীগঞ্জ", "কাপাসিয়া", "শ্রীপুর"],
+    "নারায়ণগঞ্জ": ["নারায়ণগঞ্জ সদর", "বন্দর", "আড়াইহাজার", "রূপগঞ্জ", "সোনারগাঁও"],
+    "নরসিংদী": ["নরসিংদী সদর", "বেলাবো", "মনোহরদী", "পলাশ", "রায়পুরা", "শিবপুর"],
+    "মানিকগঞ্জ": ["মানিকগঞ্জ সদর", "সিংগাইর", "শিবালয়", "সাটুরিয়া", "হরিরামপুর", "ঘিওর", "দৌলতপুর"],
+    "মুন্সিগঞ্জ": ["মুন্সিগঞ্জ সদর", "শ্রীনগর", "সিরাজদিখান", "লৌহজং", "টঙ্গিবাড়ী", "গজারিয়া"],
+    "ফরিদপুর": ["ফরিদপুর সদর", "বোয়ালমারী", "আলফাডাঙ্গা", "মধুখালী", "ভাঙ্গা", "নগরকান্দা", "সালথা", "সদরমপুর", "চরভদ্রাসন"],
+    "গোপালগঞ্জ": ["গোপালগঞ্জ সদর", "টুঙ্গিপাড়া", "কোটালীপাড়া", "কাশিয়ানী", "মুকসুদপুর"],
+    "মাদারীপুর": ["মাদারীপুর সদর", "শিবচর", "কালকিনি", "রাজৈর"],
+    "শরীয়তপুর": ["শরীয়তপুর সদর", "নড়িয়া", "জাজিরা", "গোসাইরহাট", "ডামুড্যা", "ভেদরগঞ্জ"],
+    "রাজবাড়ী": ["রাজবাড়ী সদর", "গোয়ালন্দ", "পাংশা", "বালিয়াকান্দি", "কালুখালী"],
+    "কিশোরগঞ্জ": ["কিশোরগঞ্জ সদর", "হোসেনপুর", "কটিয়াদী", "পাকুন্দিয়া", "তাড়াইল", "করিমগঞ্জ", "ইটনা", "মিঠামইন", "অষ্টগ্রাম", "নিকলী", "বাজিতপুর", "কুলিয়ারচর", "ভৈরব"],
+    "টাঙ্গাইল": ["টাঙ্গাইল সদর", "মির্জাপুর", "বাসাইল", "গোপালপুর", "সখীপুর", "কালিহাতী", "ঘাটাইল", "ভূঞাপুর", "নাগরপুর", "मधুপুর", "ধনবাড়ী", "দেলদুয়ার"]
+  },
+  "চট্টগ্রাম": {
+    "চট্টগ্রাম": ["চট্টগ্রাম সদর", "পতেঙ্গা", "পাঁচলাইশ", "ডবলমুরিং", "কোতোয়ালী", "হাটহাজারী", "সীতাকুণ্ড", "মিরসরাই", "পটিয়া", "বোয়ালখালী", "আনোয়ারা", "চন্দনাইশ", "সাতকানিয়া", "লোহাগাড়া", "ফটিকছড়ি", "রাউজান", "রাঙ্গুনিয়া", "সন্দ্বীপ"],
+    "কক্সবাজার": ["কক্সবাজার সদর", "চাকরিয়া", "উখিয়া", "টেকনাফ", "রামু", "পেকুয়া", "মহেশখালী", "কুতুবদিয়া"],
+    "কুমিল্লা": ["কুমিল্লা সদর", "চৌদ্দগ্রাম", "লাকসাম", "বরুড়া", "দাউদকান্দি", "চান্দিনা", "বুড়িচং", "ব্রাহ্মণপাড়া", "দেবিদ্বার", "মুরাদনগর", "লাঙ্গলকোট", "হোমনা", "তিতাস", "মেঘনা", "মনোহরগঞ্জ", "সদর দক্ষিণ"],
+    "নোয়াখালী": ["নোয়াখালী সদর", "বেগমগঞ্জ", "সেনবাগ", "চাটখিল", "কোম্পানীগঞ্জ", "হাতিয়া", "সুবর্ণচর", "কবিরহাট", "সোনাইমুড়ী"],
+    "ফেনী": ["ফেনী সদর", "ছাগলনাইয়া", "দাগনভূঞা", "পরশুরাম", "ফুলগাজী", "সোনাগাজী"],
+    "চাঁদপুর": ["চাঁদপুর সদর", "হাজীগঞ্জ", "শাহরাস্তি", "কচুয়া", "ফরিদগঞ্জ", "মতলব উত্তর", "মতলব দক্ষিণ", "হাইমচর"],
+    "লক্ষ্মীপুর": ["লক্ষ্মীপুর সদর", "রায়পুর", "রামগঞ্জ", "রামগতি", "কমলনগর"],
+    "ব্রাহ্মণবাড়িয়া": ["ব্রাহ্মণবাড়িয়া সদর", "কসবা", "নবীনগর", "সরাইল", "নাসিরনগর", "আশুগঞ্জ", "বাঞ্ছারামপুর", "আখাউড়া", "বিজয়নগর"],
+    "রাঙ্গামাটি": ["রাঙ্গামাটি সদর", "কাপ্তাই", "কাউখালী", "বাঘাইছড়ি", "লংগদু", "নানিয়ারচর", "রাজস্থলী", "বিলাইছড়ি", "জুরাছড়ি", "বরকল"],
+    "খাগড়াছড়ি": ["খাগড়াছড়ি সদর", "দীঘিনালা", "পানছড়ি", "মাটিরাঙ্গা", "গুইমারা", "মানিকছড়ি", "রামগড়", "মহালছড়ি", "লক্ষ্মীছড়ি"],
+    "বান্দরবান": ["বান্দরবান সদর", "রুমা", "থানচি", "রোয়াংছড়ি", "লামা", "আলীকদম", "নাইক্ষ্যংছড়ি"]
+  },
+  "রাজশাহী": {
+    "রাজশাহী": ["বোয়ালিয়া", "মতিহার", "রাজপাড়া", "শাহ মখদুম", "পবা", "গোদাগাড়ী", "তানোর", "মোহনপুর", "বাগমারা", "দুর্গাপুর", "পুঠিয়া", "চারঘাট", "বাঘা"],
+    "বগুড়া": ["বগুড়া সদর", "শাজাহানপুর", "শেরপুর", "ধুনট", "নন্দীগ্রাম", "কাহালু", "আদমদীঘি", "দুপচাঁচিয়া", "শিবগঞ্জ", "সোনাতলা", "গাবতলী", "সারিয়াকান্দি"],
+    "পাবনা": ["পাবনা সদর", "ঈশ্বরদী", "ভাঙ্গুড়া", "চাটমোহর", "ফরিদপুর", "সুজানগর", "বেড়া", "সাঁথিয়া", "আটঘরিয়া"],
+    "নাটোর": ["নাটোর সদর", "সিংড়া", "বড়াইগ্রাম", "লালপুর", "বাগাতিপাড়া", "গুরুদাসপুর", "নলডাঙ্গা"],
+    "নওগাঁ": ["নওগাঁ সদর", "রানীনগর", "আত্রাই", "মহাদেবপুর", "ধামইরহাট", "পত্নীতলা", "বদলগাছী", "সাপাহার", "পোরশা", "নিয়ামতপুর", "মান্দা"],
+    "চাঁপাইনবাবগঞ্জ": ["চাঁপাইনবাবগঞ্জ সদর", "শিবগঞ্জ", "গোমস্তাপুর", "নাচোল", "ভোলাহাট"],
+    "জয়পুরহাট": ["জয়পুরহাট সদর", "পাঁচবিবি", "আক্কেলপুর", "ক্ষেতলাল", "কালাই"],
+    "সিরাজগঞ্জ": ["সিরাজগঞ্জ সদর", "কাজীপুর", "বেলকুচি", "কামারখন্দ", "উল্লাপাড়া", "শাহজাদপুর", "রায়গঞ্জ", "তাড়াশ", "চৌহালী"]
+  },
+  "খুলনা": {
+    "খুলনা": ["খুলনা সদর", "দৌলতপুর", "খালিশপুর", "خانজাহান আলী", "দিঘলিয়া", "রূপসা", "বটিয়াঘাটা", "ডুমুরিয়া", "ফুলতলা", "দাকোপ", "কয়রা", "তেরখাদা"],
+    "বাগেরহাট": ["বাগেরহাট সদর", "ফকিরহাট", "মোল্লাহাট", "চিতলমারী", "মোড়েলগঞ্জ", "কচুয়া", "শরণখোলা", "মোংলা", "রামপাল"],
+    "সাতক্ষীরা": ["সাতক্ষীরা সদর", "কলারোয়া", "তালা", "দেবহাটা", "কালীগঞ্জ", "শ্যামনগর", "আশাশুনি"],
+    "যশোর": ["যশোর সদর", "অভয়নগর", "কেশবপুর", "চৌগাছা", "ঝিকরগাছা", "বাঘারপাড়া", "মণিরামপুর", "শার্শা"],
+    "নড়াইল": ["নড়াইল সদর", "লোহাগড়া", "কালিয়া"],
+    "মাগুরা": ["মাগুরা সদর", "শ্রীপুর", "মোহাম্মদপুর", "শালিখা"],
+    "ঝিনাইদহ": ["ঝিনাইদহ সদর", "শৈলকুপা", "হরিণাকুণ্ডু", "কালীগঞ্জ", "কোটচাঁদপুর", "মহেশপুর"],
+    "কুষ্টিয়া": ["কুষ্টিয়া সদর", "কুমারখালী", "খোকসা", "মিরপুর", "দৌলতপুর", "ভেড়ামারা"],
+    "চুয়াডাঙ্গা": ["চুয়াডাঙ্গা সদর", "আলমডাঙ্গা", "দামুড়হুদা", "জীবননগর"],
+    "মেহেরপুর": ["মেহেরপুর সদর", "মুজিবনগর", "গাংনী"]
+  },
+  "বরিশাল": {
+    "বরিশাল": ["বরিশাল সদর", "বাকেরগঞ্জ", "বাবুগঞ্জ", "উজিরপুর", "বানারীপাড়া", "গৌরনদী", "মুলাদী", "মেহেন্দিগঞ্জ", "হিজলা", "আগাৈলঝাড়া"],
+    "পটুয়াখালী": ["পটুয়াখালী সদর", "বাউফল", "দশমিনা", "গলাচিপা", "কলাপাড়া", "মির্জাগঞ্জ", "দুমকী", "রাঙ্গাবালী"],
+    "ভোলা": ["ভোলা সদর", "বোরহানউদ্দিন", "লালমোহন", "চরফ্যাশন", "তজুমদ্দিন", "মনপুরা", "দৌলতখান"],
+    "পিরোজপুর": ["পিরোজপুর সদর", "নাজিরপুর", "নেছারাবাদ", "ভাণ্ডারিয়া", "মঠবাড়িয়া", "কাউখালী", "ইন্দুরকানী"],
+    "বরগুনা": ["বরগুনা সদর", "আমতলী", "তালতলী", "পাথরঘাটা", "বামনা", "বেতাগী"],
+    "ঝালকাঠি": ["ঝালকাঠি সদর", "নলছিটি", "রাজাপুর", "কাঠালিয়া"]
+  },
+  "সিলেট": {
+    "সিলেট": ["সিলেট সদর", "বিয়ানীবাজার", "গোলাপগঞ্জ", "ফেঞ্চুগঞ্জ", "বালাগঞ্জ", "বিশ্বনাথ", "জৈন্তাপুর", "জকিগঞ্জ", "কানাইঘাট", "কোম্পানীগঞ্জ", "গোয়াইনঘাট", "দক্ষিণ সুরমা", "ওসমানীনগর"],
+    "সুনামগঞ্জ": ["সুনামগঞ্জ সদর", "ছাতক", "জগন্নাথপুর", "দোয়ারাবাজার", "তাহিরপুর", "ধর্মপাশা", "জামালগঞ্জ", "শাল্লা", "দিরাই", "বিশ্বম্ভরপুর", "মধ্যনগর"],
+    "মৌলভীবাজার": ["মৌলভীবাজার সদর", "শ্রীমঙ্গল", "কমলগঞ্জ", "কুলাউড়া", "বড়লেখা", "জুড়ী", "রাজনগর"],
+    "হবিগঞ্জ": ["হবিগঞ্জ সদর", "নবীগঞ্জ", "বাহুবল", "চুনারুঘাট", "মাধবপুর", "আজমিরীগঞ্জ", "বানিয়াচং", "লাখাই", "শায়েস্তাগঞ্জ"]
+  },
+  
+"রংপুর": {
+    "রংপুর": ["রংপুর সদর", "মিঠাপুকুর", "পীরগঞ্জ", "পীরগাছা", "কাউনিয়া", "গঙ্গাচড়া", "তারাগঞ্জ", "বদরগঞ্জ"],
+    "দিনাজপুর": ["দিনাজপুর সদর", "বিরামপুর", "বীরগঞ্জ", "বোচাগঞ্জ", "ফুলবাড়ী", "চিরিরবন্দর", "ঘোড়াঘাট", "হাকিমপুর", "কাহারোল", "খানসামা", "নবাবগঞ্জ", "পার্বতীপুর"],
+    "কুড়িগ্রাম": ["কুড়িগ্রাম সদর", "উলিপুর", "নাগেশ্বরী", "ভুরুঙ্গামারী", "ফুলবাড়ী", "রাজারহাট", "চিলমারী", "রৌমারী", "চর রাজিবপুর"],
+    "গাইবান্ধা": ["গাইবান্ধা সদর", "গোবিন্দগঞ্জ", "পলাশবাড়ী", "সাদুল্লাপুর", "সুন্দরগঞ্জ", "সাঘাটা", "ফুলছড়ি"],
+    "লালমনিরহাট": ["লালমনিরহাট সদর", "কালীগঞ্জ", "হাতীবান্ধা", "পাটগ্রাম", "আদিতমারী"],
+    "নীলফামারী": ["নীলফামারী সদর", "সৈয়দপুর", "ডোমার", "ডিমলা", "জলঢাকা", "কিশোরগঞ্জ"],
+    "ঠাকুরগাঁও": ["ঠাকুরগাঁও সদর", "পীরগঞ্জ", "বালিয়াডাঙ্গী", "রাণীশংকৈল", "হরিপুর"],
+    "পঞ্চগড়": ["পঞ্চগড় সদর", "বোদা", "দেবীগঞ্জ", "তেঁতুলিয়া", "আটোয়ারী"]
+  },
+  "ময়মনসিংহ": {
+    "ময়মনসিংহ": ["ময়মনসিংহ সদর", "মুক্তাগাছা", "ফুলবাড়ীয়া", "ত্রিশাল", "ভালুকা", "গফরগাঁও", "নান্দাইল", "ঈশ্বরগঞ্জ", "গৌরীপুর", "ধোবাউড়া", "ফুলপুর", "তারাকান্দা"],
+    "জামালপুর": ["জামালপুর সদর", "মেলান্দহ", "ইসলামপুর", "দেওয়ানগঞ্জ", "বকশীগঞ্জ", "মাদারগঞ্জ", "সরিষাবাড়ী"],
+    "নেত্রকোণা": ["নেত্রকোণা সদর", "বারহাট্টা", "কলমাকান্দা", "দুর্গাপুর", "কেন্দুয়া", "মদন", "মোহনগঞ্জ", "খালিয়াজুরী", "পূর্বধলা", "আটপাড়া"],
+    "শেরপুর": ["শেরপুর সদর", "নকলা", "নালিতাবাড়ী", "ঝিনাইগাতী", "শ্রীবরদী"]
+  }
+};
+
+
+let currentApparel = 'all';
+let currentCategory = '';
+let cart = [];
+
+function toggleSearch() {
+  const overlay = document.getElementById('searchOverlay');
+  const input = document.getElementById('productSearch');
+  if (overlay.style.display === 'none' || overlay.style.display === '') {
+    overlay.style.display = 'block';
+    input.focus();
+  } else {
+    overlay.style.display = 'none';
+    input.value = '';
+    renderProducts();
+  }
+}
+
+function setApparel(type, el) {
+  document.querySelectorAll('.apparel-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentApparel = type;
+  renderProducts();
+}
+
+function setCategory(cat, el) {
+  document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentCategory = cat;
+  renderProducts();
+}
+
+function toggleProduct(id, event) {
+  if (event && (event.target.classList.contains('qty-btn') || event.target.closest('.qty-controls'))) return;
+  const product = products.find(p => p.id === id);
+  const index = cart.findIndex(item => item.id === id);
+  if (index === -1) { cart.push({ ...product, qty: 1 }); } else { cart.splice(index, 1); }
+  updateCartUI();
+  renderProducts();
+}
+
+function updateQuantity(id, amount, event) {
+  if (event) event.stopPropagation();
+  const item = cart.find(p => p.id === id);
+  if (!item) return;
+  item.qty += amount;
+  if (item.qty <= 0) { cart = cart.filter(p => p.id !== id); }
+  updateCartUI();
+  renderProducts();
+}
+
+function updateCartUI() {
+  const shopBar = document.getElementById('shopBar');
+  const cartCount = document.getElementById('cartCount');
+  if (cart.length > 0) {
+    shopBar.style.display = 'block';
+    const totalItems = cart.reduce((acc, p) => acc + p.qty, 0);
+    cartCount.innerText = `${totalItems} ${totalItems === 1 ? 'Item' : 'Items'}`;
+  } else { shopBar.style.display = 'none'; }
+}
+
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  const searchInput = document.getElementById('productSearch');
+  const searchQuery = searchInput ? searchInput.value.toLowerCase() : "";
+
+  const filtered = products.filter(p => {
+    const apparelMatch = currentApparel === 'all' || p.type === currentApparel;
+    const categoryMatch = currentCategory === '' || p.cat === currentCategory;
+    const searchMatch = p.name.toLowerCase().includes(searchQuery);
+    return apparelMatch && categoryMatch && searchMatch;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px;">No products found!</p>`;
+    return;
+  }
+
+  // এখান থেকে ম্যাপ শুরু
+  grid.innerHTML = filtered.map(p => { 
+    const cartItem = cart.find(item => item.id === p.id);
+    const isSelected = !!cartItem;
+    const quantity = cartItem ? cartItem.qty : 0;
+    const images = p.images || [p.img];
+
+    // --- এখান থেকে ডবল কোডগুলো সরিয়ে দিয়ে শুধু এক সেট রাখা হলো ---
+    
+    // --- নতুন discount লজিক ---
+    let discountHTML = ''; // শুরুতে খালি থাকবে
+    let priceHTML = '';    // দামের জন্য (নাম পরিবর্তন করে priceHTML রাখা হলো যাতে নিচের সাথে মিলে যায়)
+
+    if (p.oldPrice) {
+      // যদি ডিসকাউন্ট থাকে
+      discountHTML = `<div class="discount-label">DISCOUNT !!!</div>`;
+      priceHTML = `
+          <div class="price-box">
+             <span class="old-price">${p.oldPrice}</span>
+             <span class="current-price">${p.price}</span>
+          </div>`;
+    } else {
+      // ডিসকাউন্ট না থাকলে
+      priceHTML = `
+          <div class="price-box">
+             <span class="current-price">${p.price}</span>
+          </div>`;
+    }
+    // -----------------------------
+    
+    // --- লজিক শেষ ---
+
+    return `
+      <div class="product-card ${isSelected ? 'selected' : ''}" onclick="toggleProduct(${p.id}, event)">
+        
+        ${discountHTML} 
+
+        <div class="product-header">
+          <span class="qty-label">${quantity} SELECTED</span>
+          <div class="qty-controls">
+            <button class="qty-btn plus" onclick="updateQuantity(${p.id}, 1, event)">+</button>
+            <button class="qty-btn minus" onclick="updateQuantity(${p.id}, -1, event)">−</button>
+          </div>
+        </div>
+
+        <div class="img-container">
+          <div class="product-img-slider" onscroll="updateDots(this, ${p.id})">
+            ${images.map(imgSrc => `<img src="${imgSrc}" alt="${p.name}">`).join('')}
+          </div>
+          
+          <div class="dot-container" id="dots-${p.id}">
+            ${images.map((_, index) => `<span class="dot ${index === 0 ? 'active' : ''}"></span>`).join('')}
+          </div>
+        </div>
+
+        <div class="product-info">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;">${p.cat}</div>
+          <div style="font-weight:600;margin:5px 0;color:#fff;">${p.name}</div>
+          
+          ${priceHTML} 
+          
+          <span class="whatsapp-tag">${isSelected ? 'Added to Cart' : 'Swipe to see more'}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+
+
+
+
+function openCheckoutModal() { document.getElementById('modalOverlay').classList.add('active'); }
+function closeCheckoutModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+
+
+function updateDistricts() {
+  const div = document.getElementById('divSelect').value;
+  const distSelect = document.getElementById('distSelect');
+  const upSelect = document.getElementById('upSelect');
+  const notice = document.getElementById('deliveryNotice');
+  
+  // রিসেট করা
+  distSelect.innerHTML = '<option value="">জেলা সিলেক্ট করুন</option>';
+  upSelect.innerHTML = '<option value="">প্রথমে জেলা সিলেক্ট করুন</option>';
+  upSelect.disabled = true;
+  
+  // বিভাগ পরিবর্তনের সময় নোটিশটি লুকিয়ে রাখা
+  notice.style.display = "none";
+
+  if (div && bdData[div]) {
+    distSelect.disabled = false;
+    Object.keys(bdData[div]).forEach(dist => {
+      distSelect.innerHTML += `<option value="${dist}">${dist}</option>`;
+    });
+  } else {
+    distSelect.disabled = true;
+  }
+}
+
+function updateUpazilas() {
+  const div = document.getElementById('divSelect').value;
+  const dist = document.getElementById('distSelect').value;
+  const upSelect = document.getElementById('upSelect');
+  const notice = document.getElementById('deliveryNotice');
+
+  upSelect.innerHTML = '<option value="">উপজেলা সিলেক্ট করুন</option>';
+
+  if (dist && bdData[div][dist]) {
+    upSelect.disabled = false;
+    bdData[div][dist].forEach(up => {
+      upSelect.innerHTML += `<option value="${up}">${up}</option>`;
+    });
+
+    // এখন এখানে চার্জ ক্যালকুলেশন হবে (জেলা সিলেকশনের পর)
+    // লজিক: জেলা যদি "খুলনা" হয় তবে ৬০, নাহলে ১২০
+    const charge = (dist === "খুলনা") ? 60 : 120;
+    const locationText = (dist === "খুলনা") ? "খুলনা জেলার ভেতরে" : "খুলনা জেলার বাইরে";
+    
+    notice.innerText = `ডেলিভারি চার্জ: ৳${charge} (${locationText})`;
+    notice.style.display = "block"; // জেলা সিলেক্ট করলে বক্সটি দেখাবে
+
+  } else {
+    upSelect.disabled = true;
+    notice.style.display = "none"; // জেলা সিলেক্ট না থাকলে লুকিয়ে থাকবে
+  }
+}
+
+
+
+
+function filterProducts() {
+  renderProducts();
+}
+
+function sendWhatsAppOrder() {
+  if (cart.length === 0) return;
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const division = document.getElementById('divSelect').value;
+  const district = document.getElementById('distSelect').value;
+  const upazila = document.getElementById('upSelect').value;
+  const landmark = document.getElementById('custLandmark').value.trim();
+
+  if (!name || !phone || !division || !district || !upazila) {
+    alert("সব তথ্য পূরণ করুন!"); return;
+  }
+
+  // ডেলিভারি চার্জ ক্যালকুলেশন
+  const deliveryCharge = (division === "খুলনা") ? 60 : 120;
+
+  let totalPrice = 0;
+  let productList = cart.map((p, i) => {
+    totalPrice += (p.priceNum * p.qty);
+    return `${i+1}. ${p.name} (x${p.qty})`;
+  }).join('\n');
+
+  // ডেলিভারি চার্জসহ চূড়ান্ত দাম
+  const finalTotal = totalPrice + deliveryCharge;
+
+  const message = `হ্যালো! আমি এই পণ্যগুলো নিতে চাই:\n\n${productList}\n\nসাবটোটাল: ৳${totalPrice}\nডেলিভারি চার্জ: ৳${deliveryCharge} (${division === "খুলনা" ? "খুলনার ভেতরে" : "খুলনার বাইরে"})\nমোট পরিশোধযোগ্য: ৳${finalTotal}\n\nডেলিভারি ঠিকানা:\nনাম: ${name}\nফোন: ${phone}\nঠিকানা: ${upazila}, ${district}, ${division}\nচেনার উপায়: ${landmark}`;
+  
+  window.open(`https://wa.me/${myNumber}?text=${encodeURIComponent(message)}`, '_blank');
+}
+
+
+function updateDots(slider, productId) {
+    const scrollLeft = slider.scrollLeft;
+    const width = slider.offsetWidth;
+    // কোন ছবিটা সামনে আছে তা বের করা
+    const activeIndex = Math.round(scrollLeft / width);
+    
+    const dots = document.querySelectorAll(`#dots-${productId} .dot`);
+    dots.forEach((dot, index) => {
+        if (index === activeIndex) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+}
+
+
+
+</script>
+
+
+</body>
+</html>

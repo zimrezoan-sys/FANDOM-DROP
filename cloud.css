@@ -1,0 +1,41 @@
+/* পতাকার মুল কন্টেইনার */
+        .japan-flag {
+            width: 600px;          /* পতাকার প্রস্থ */
+            height: 400px;         /* পতাকার দৈর্ঘ্য (অনুপাত 2:3) */
+            background-color: white;  /* সাদা পটভূমি */
+            position: relative;    /* বৃত্তের অবস্থানের জন্য */
+            border: 1px solid #ccc; /* সীমানা শুধু দেখার সুবিধার্থে, প্রয়োজনে মুছে দিন */
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        /* লাল বৃত্ত */
+        .japan-flag::before {
+            content: "";
+            position: absolute;
+            top: 50%;              /* উপরে থেকে ৫০% দূরত্বে */
+            left: 50%;             /* বাম থেকে ৫০% দূরত্বে */
+            transform: translate(-50%, -50%); /* সঠিক মাঝ বরাবর স্থাপন */
+            width: 240px;          /* বৃত্তের ব্যাস (পতাকার প্রস্থের ২/৫) */
+            height: 240px;         /* একই মান রাখতে হবে যেন বৃত্ত হয় */
+            background-color: #BC002D; /* জাপানের লাল রঙের হেক্স কোড */
+            border-radius: 50%;     /* পূর্ণ বৃত্ত তৈরি */
+        }
+
+        /* ছোট ডিভাইসের জন্য স্কেলেবল */
+        @media (max-width: 700px) {
+            .japan-flag {
+                width: 300px;
+                height: 200px;
+            }
+            .japan-flag::before {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        /* পতাকার নিচে তথ্য */
+        .info {
+            text-align: center;
+            margin-top: 20px;
+            font-family: Arial, sans-serif;
+        }
